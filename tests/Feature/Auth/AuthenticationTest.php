@@ -27,12 +27,17 @@ test('users can authenticate using the login screen', function () {
 test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();
 
-    $response = $this->post(route('login.store'), [
-        'email' => $user->email,
-        'password' => 'wrong-password',
-    ]);
+    $response = $this->from(route('login'))
+        ->followingRedirects()
+        ->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
 
-    $response->assertSessionHasErrorsIn('email');
+    $response
+        ->assertOk()
+        ->assertSee(__('These credentials do not match our records.'))
+        ->assertSee('aria-invalid="true"', false);
 
     $this->assertGuest();
 });

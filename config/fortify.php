@@ -167,7 +167,8 @@ return [
         Features::twoFactorAuthentication([
             'confirm' => true,
             'confirmPassword' => true,
-            // 'window' => 0
+            // Allow ±90s of clock drift between the server and authenticator apps.
+            'window' => 3,
         ]),
         Features::passkeys([
             'confirmPassword' => true,

@@ -65,13 +65,13 @@ new #[Title('Profile settings')] class extends Component {
     #[Computed]
     public function hasUnverifiedEmail(): bool
     {
-        return Auth::user() instanceof MustVerifyEmail && ! Auth::user()->hasVerifiedEmail();
+        return Auth::user() instanceof MustVerifyEmail && !Auth::user()->hasVerifiedEmail();
     }
 
     #[Computed]
     public function showDeleteUser(): bool
     {
-        return ! Auth::user() instanceof MustVerifyEmail
+        return !Auth::user() instanceof MustVerifyEmail
             || (Auth::user() instanceof MustVerifyEmail && Auth::user()->hasVerifiedEmail());
     }
 }; ?>
@@ -83,37 +83,50 @@ new #[Title('Profile settings')] class extends Component {
 
     <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
+            <fieldset class="fieldset">
+                <label class="label" for="name">{{ __('Name') }}</label>
+                <input type="text" id="name" class="input w-full" placeholder="{{ __('Name') }}" wire:model="name"
+                    required autocomplete="name" />
+            </fieldset>
 
             <div>
-                <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
+                <fieldset class="fieldset">
+                    <label class="label" for="email">{{ __('Email') }}</label>
+                    <input id="email" class="input w-full" placeholder="{{ __('Email') }}" wire:model="email"
+                        type="email" required autocomplete="email" />
+                </fieldset>
 
                 @if ($this->hasUnverifiedEmail)
                     <div>
-                        <flux:text class="mt-4">
+                        <p class="mt-4">
+                            {{ __('Your email address is unverified.') }}
+                            <button class="text-sm cursor-pointer" wire:click.prevent="resendVerificationNotification">
+                                {{ __('Click here to re-send the verification email.') }}
+                            </button>
+                        </p>
+                        {{-- <flux:text class="mt-4">
                             {{ __('Your email address is unverified.') }}
 
                             <flux:link class="text-sm cursor-pointer" wire:click.prevent="resendVerificationNotification">
                                 {{ __('Click here to re-send the verification email.') }}
                             </flux:link>
-                        </flux:text>
+                        </flux:text> --}}
 
                         @if (session('status') === 'verification-link-sent')
-                            <flux:text class="mt-2 font-medium !dark:text-green-400 !text-green-600">
+                            <p class="mt-2 font-medium text-base-content/70">
                                 {{ __('A new verification link has been sent to your email address.') }}
-                            </flux:text>
+                            </p>
+                            {{-- <flux:text class="mt-2 font-medium !dark:text-green-400 !text-green-600">
+                                {{ __('A new verification link has been sent to your email address.') }}
+                            </flux:text> --}}
                         @endif
                     </div>
                 @endif
             </div>
 
             <div class="flex items-center gap-4">
-                <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full" data-test="update-profile-button">
-                        {{ __('Save') }}
-                    </flux:button>
-                </div>
-
+                <button type="submit" class="btn btn-soft btn-primary"
+                    data-test="update-profile-button">{{ __('Save') }}</button>
             </div>
         </form>
 
